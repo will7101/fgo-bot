@@ -1,0 +1,55 @@
+{
+  "attack": {
+    "x": 1075,
+    "y": 550,
+    "w": 100,
+    "h": 100
+  },
+  "skill": {
+    "x": 44,
+    "y": 553,
+    "w": 50,
+    "h": 50
+  },
+  "skill_distance": 94,
+  "servant_distance": 319,
+  "master_skill_menu": {
+    "x": 1170,
+    "y": 287,
+    "w": 50,
+    "h": 50
+  },
+  "master_skill": {
+    "x": 882,
+    "y": 288,
+    "w": 50,
+    "h": 50
+  },
+  "master_skill_distance": 90,
+  "refresh_friends": {
+    "x": 798,
+    "y": 110,
+    "w": 80,
+    "h": 40
+  },
+  "choose_object": {
+    "x": 311,
+    "y": 466,
+    "w": 50,
+    "h": 50
+  },
+  "choose_object_distance": 318,
+  "card":{
+    "x": 77,
+    "y": 433,
+    "w": 100,
+    "h": 100
+  },
+  "card_distance": 256,
+  "noble_card":{
+    "x": 363,
+    "y": 142,
+    "w": 100,
+    "h": 100
+  }
+}
