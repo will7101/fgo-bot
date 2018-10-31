@@ -13,7 +13,7 @@ fgo自动脚本
 
 如果已经安装adb，请跳过此步骤。
 
-从http://adbshell.com/downloads下载adb kits，解压，并加入PATH。
+从[http://adbshell.com/downloads](http://adbshell.com/downloads)下载adb kits，解压，并加入PATH。
 
 在命令行中输入`adb`，出现帮助信息则说明安装成功。
 
@@ -41,11 +41,9 @@ python3 setup.py install
 
 `fgobot.BattleBot`类提供了`@at_stage()`装饰器，只需要在你自己的`python`源文件中实例化一个`bot`，然后将函数注册到对应的战斗阶段，接着运行`bot.run()`，就可以实现自动战斗。
 
-在设备/模拟器上对要打的副本和期望的助战截图，放在脚本的同级目录下。
+在设备/模拟器上对要打的副本和期望的助战截图，放在脚本的同级目录下，可以参考`/qp.png`和`/friend_qp.png`。
 
-
-
-具体例子可以参考项目根目录下的`my_bot.py`。
+具体例子可以参考`/my_bot.py`。
 
 ### API参考
 
