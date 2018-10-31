@@ -1,3 +1,7 @@
+"""
+Android device interaction.
+"""
+
 import subprocess
 import logging
 import re
@@ -5,8 +9,6 @@ import cv2 as cv
 import numpy as np
 from random import randint
 from typing import List, Tuple, Union
-
-logging.basicConfig(level=logging.DEBUG)
 
 
 class Device:
@@ -29,7 +31,7 @@ class Device:
 
         self.size = (1280, 720)
 
-    def run_cmd(self, cmd: List[str], raw: bool = False) -> Union[bytes, List[str]]:
+    def __run_cmd(self, cmd: List[str], raw: bool = False) -> Union[bytes, List[str]]:
         """
         Execute an adb command.
         Return the raw output if the `raw` parameter is set `True`.
@@ -59,8 +61,8 @@ class Device:
         :return: whether connection is successful.
         """
         if restart:
-            self.run_cmd(['kill-server'])
-        output = self.run_cmd(['connect', addr])
+            self.__run_cmd(['kill-server'])
+        output = self.__run_cmd(['connect', addr])
         for line in output:
             if line.startswith('connected'):
                 self.logger.info('Connected to device at {}.'.format(addr))
@@ -73,7 +75,7 @@ class Device:
         """
         Check if a device is connected.
         """
-        output = self.run_cmd(['devices'])
+        output = self.__run_cmd(['devices'])
         devices = 0
         for line in output:
             if line.endswith('device'):
@@ -94,7 +96,7 @@ class Device:
 
         :return: whether successful.
         """
-        output = self.run_cmd(['shell', 'wm', 'size'])
+        output = self.__run_cmd(['shell', 'wm', 'size'])
         for line in output:
             if line.startswith('Physical size'):
                 self.size = tuple(map(int, re.findall(r'\d+', line)))
@@ -113,7 +115,7 @@ class Device:
         :return: whether the event is successful.
         """
         coords = '{:d} {:d}'.format(x, y)
-        output = self.run_cmd(['shell', 'input tap {}'.format(coords)])
+        output = self.__run_cmd(['shell', 'input tap {}'.format(coords)])
         for line in output:
             if line.startswith('error'):
                 self.logger.error('Failed to tap at {}'.format(coords))
@@ -146,7 +148,7 @@ class Device:
         """
         coords0 = '{:d} {:d}'.format(pos0[0], pos0[1])
         coords1 = '{:d} {:d}'.format(pos1[0], pos1[1])
-        output = self.run_cmd(['shell', 'input swipe {} {} {:d}'.format(coords0, coords1, duration)])
+        output = self.__run_cmd(['shell', 'input swipe {} {} {:d}'.format(coords0, coords1, duration)])
         for line in output:
             if line.startswith('error'):
                 self.logger.error('Failed to swipe from {} to {} taking {:d}ms'.format(coords0, coords1, duration))
@@ -160,7 +162,7 @@ class Device:
     SDCARD_PULL = 1
 
     @staticmethod
-    def png_sanitize(s: bytes) -> bytes:
+    def __png_sanitize(s: bytes) -> bytes:
         """
         Auto-detect and replace '\r\n' or '\r\r\n' by '\n' in the given byte string.
 
@@ -182,15 +184,15 @@ class Device:
         """
         if method == self.FROM_SHELL:
             self.logger.debug('Capturing screen from shell...')
-            img = self.run_cmd(['shell', 'screencap -p'], raw=True)
-            img = self.png_sanitize(img)
+            img = self.__run_cmd(['shell', 'screencap -p'], raw=True)
+            img = self.__png_sanitize(img)
             img = np.frombuffer(img, np.uint8)
             img = cv.imdecode(img, cv.IMREAD_COLOR)
             return img
         elif method == self.SDCARD_PULL:
             self.logger.debug('Capturing screen from sdcard pull...')
-            self.run_cmd(['shell', 'screencap -p /sdcard/sc.png'])
-            self.run_cmd(['pull', '/sdcard/sc.png', './sc.png'])
+            self.__run_cmd(['shell', 'screencap -p /sdcard/sc.png'])
+            self.__run_cmd(['pull', '/sdcard/sc.png', './sc.png'])
             img = cv.imread('./sc.png', cv.IMREAD_COLOR)
             return img
         else:

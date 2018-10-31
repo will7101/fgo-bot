@@ -45,11 +45,22 @@
     "w": 100,
     "h": 100
   },
-  "card_distance": 256,
   "noble_card":{
     "x": 363,
     "y": 142,
     "w": 100,
     "h": 100
+  },
+  "card_distance": 256,
+  "change":{
+    "x":87,
+    "y":300,
+    "w":100,
+    "h":100
+  },
+  "change_distance": 200,
+  "swipe": {
+    "friend": [600, 602, 600, 400],
+    "quest": [960, 588, 960, 400]
   }
 }

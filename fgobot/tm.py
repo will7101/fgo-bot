@@ -34,19 +34,29 @@ class TM:
         # the screencap image. Needs to be updated before matching.
         self.screen = None
 
+    def load_image(self, im: Path, name=''):
+        """
+        Load an image (in png format). May override default images.
+
+        :param im: path to the image.
+        :param name: specify the name of the image in the dict. If not given, use the filename as default.
+        """
+        assert im.is_file() and im.name.endswith('.png')
+        name = name or im.name[:-4]
+        self.images[name] = cv.imread(str(im), cv.IMREAD_COLOR)
+        # self.images[name] = cv.cvtColor(self.images[name], cv.COLOR_BGR2RGB)
+        # plt.figure(name)
+        # plt.imshow(self.images[name])
+        # plt.show()
+        logger.debug('Loaded image {}'.format(name))
+
     def load_images(self):
         """
         Load template images from directory.
         """
         im_dir = Path(__file__).absolute().parent / 'images'
         for im in im_dir.glob('*.png'):
-            name = im.name[:-4]
-            self.images[name] = cv.imread(str(im), cv.IMREAD_COLOR)
-            # self.images[name] = cv.cvtColor(self.images[name], cv.COLOR_BGR2RGB)
-            # plt.figure(name)
-            # plt.imshow(self.images[name])
-            # plt.show()
-            logger.debug('Loaded image {}'.format(name))
+            self.load_image(im)
 
         logger.info('Images loaded successfully.')
 
@@ -117,4 +127,5 @@ class TM:
         :param im: the name of the image
         :param threshold: the threshold of matching. If not given, will be set to the default threshold.
         """
+        threshold = threshold or self.threshold
         return self.probability(im) >= threshold
