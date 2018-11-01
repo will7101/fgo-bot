@@ -15,6 +15,9 @@ from random import randint
 
 logger = logging.getLogger('bot')
 
+INTERVAL_SHORT = 1
+INTERVAL_MID = 3
+INTERVAL_LONG = 10
 
 class BattleBot:
     """
@@ -79,11 +82,10 @@ class BattleBot:
         self.quest_threshold = quest_threshold
         self.friend_threshold = friend_threshold
 
-        # Load __button coords from config
+        # Load button coords from config
         btn_path = Path(__file__).absolute().parent / 'config' / 'buttons.json'
         with open(btn_path) as f:
             self.buttons = json.load(f)
-        # print(self.buttons)
 
         logger.debug('Bot initialized.')
 
@@ -159,7 +161,7 @@ class BattleBot:
         logger.debug("Wait until image '{}' appears.".format(im))
         self.tm.update_screen()
         while not self.__exists(im):
-            self.__wait(3)
+            self.__wait(INTERVAL_MID)
 
     def __get_current_stage(self) -> int:
         """
@@ -190,7 +192,7 @@ class BattleBot:
                 if self.__exists(im, threshold=self.friend_threshold):
                     return im
             self.__swipe('friend')
-            self.__wait(1)
+            self.__wait(INTERVAL_SHORT)
         return ''
 
     def __enter_battle(self) -> bool:
@@ -202,36 +204,38 @@ class BattleBot:
         self.__wait_until('menu')
         while not self.__find_and_tap('quest', threshold=self.quest_threshold):
             self.__swipe('quest')
-            self.__wait(1)
-        self.__wait(2)
+            self.__wait(INTERVAL_SHORT)
+        self.__wait(INTERVAL_MID)
 
         # no enough AP
         if self.__exists('ap_regen'):
             if not self.ap:
                 return False
             else:
+                ok = False
                 for ap_item in self.ap:
                     if self.__find_and_tap(ap_item):
                         self.__wait(1)
                         if self.__find_and_tap('decide'):
                             self.__wait_until('refresh_friends')
+                            ok = True
                             break
-                if self.__exists('ap_regen'):
+                if not ok:
                     return False
 
         # look for friend servant
         friend = self.__find_friend()
         while not friend:
             self.__find_and_tap('refresh_friends')
-            self.__wait(1)
+            self.__wait(INTERVAL_SHORT)
             self.__find_and_tap('yes')
-            self.__wait(10)
+            self.__wait(INTERVAL_LONG)
             friend = self.__find_friend()
         self.__find_and_tap(friend)
-        self.__wait(1)
+        self.__wait(INTERVAL_SHORT)
         self.__wait_until('start_quest')
         self.__find_and_tap('start_quest')
-        self.__wait(1)
+        self.__wait(INTERVAL_SHORT)
         self.__wait_until('attack')
         return True
 
@@ -254,7 +258,7 @@ class BattleBot:
             self.stage_handlers[stage]()
 
             while True:
-                self.__wait(3)
+                self.__wait(INTERVAL_MID)
                 if self.__exists('bond'):
                     logger.info("'与从者的羁绊' detected. Leaving battle...")
                     return rounds
@@ -264,17 +268,18 @@ class BattleBot:
 
     def __end_battle(self):
         self.__find_and_tap('bond')
-        self.__wait(1)
+        self.__wait(INTERVAL_SHORT)
         self.__wait_until('gain_exp')
         self.__find_and_tap('gain_exp')
-        self.__wait(1)
+        self.__wait(INTERVAL_SHORT)
         self.__wait_until('next_step')
         self.__find_and_tap('next_step')
-        self.__wait(5)
+        self.__wait(INTERVAL_MID)
 
         # quest first-complete reward
         if self.__exists('please_tap'):
             self.__find_and_tap('please_tap')
+            self.__wait(INTERVAL_SHORT)
 
         # not send friend application
         if self.__exists('not_apply'):
@@ -310,7 +315,7 @@ class BattleBot:
         x += self.buttons['skill_distance'] * (skill - 1)
         self.device.tap_rand(x, y, w, h)
         logger.debug('Used skill ({}, {})'.format(servant, skill))
-        self.__wait(3)
+        self.__wait(INTERVAL_MID)
 
         if self.__exists('choose_object'):
             if obj is None:
@@ -335,13 +340,13 @@ class BattleBot:
 
         x, y, w, h = self.__button('master_skill_menu')
         self.device.tap_rand(x, y, w, h)
-        self.__wait(2)
+        self.__wait(INTERVAL_SHORT)
 
         x, y, w, h = self.__button('master_skill')
         x += self.buttons['master_skill_distance'] * (skill - 1)
         self.device.tap_rand(x, y, w, h)
         logger.debug('Used master skill {}'.format(skill))
-        self.__wait(2)
+        self.__wait(INTERVAL_SHORT)
 
         if self.__exists('choose_object'):
             if obj is None:
@@ -365,6 +370,7 @@ class BattleBot:
                 self.device.tap_rand(x, y, w, h)
                 logger.debug('Chose master skill object ({}, {}).'.format(obj, obj2))
 
+                self.__wait(INTERVAL_SHORT)
                 self.__find_and_tap('change')
                 logger.debug('Order Change')
             else:
