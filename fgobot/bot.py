@@ -16,8 +16,9 @@ from random import randint
 logger = logging.getLogger('bot')
 
 INTERVAL_SHORT = 1
-INTERVAL_MID = 3
+INTERVAL_MID = 2
 INTERVAL_LONG = 10
+
 
 class BattleBot:
     """
@@ -28,8 +29,8 @@ class BattleBot:
                  quest: str = 'quest.png',
                  friend: Union[str, List[str]] = 'friend.png',
                  ap: List[str] = None,
-                 quest_threshold: float = 0.98,
-                 friend_threshold: float = 0.98
+                 quest_threshold: float = 0.97,
+                 friend_threshold: float = 0.97
                  ):
         """
 
@@ -315,7 +316,7 @@ class BattleBot:
         x += self.buttons['skill_distance'] * (skill - 1)
         self.device.tap_rand(x, y, w, h)
         logger.debug('Used skill ({}, {})'.format(servant, skill))
-        self.__wait(INTERVAL_MID)
+        self.__wait(INTERVAL_SHORT)
 
         if self.__exists('choose_object'):
             if obj is None:
@@ -325,6 +326,8 @@ class BattleBot:
                 x += self.buttons['choose_object_distance'] * (obj - 1)
                 self.device.tap_rand(x, y, w, h)
                 logger.debug('Chose skill object {}.'.format(obj))
+                self.__wait(INTERVAL_SHORT)
+                self.__wait(INTERVAL_SHORT)
 
     def use_master_skill(self, skill: int, obj=None, obj2=None):
         """
@@ -390,7 +393,8 @@ class BattleBot:
         self.__wait_until('attack')
 
         self.__find_and_tap('attack')
-        self.__wait(3)
+        self.__wait(INTERVAL_SHORT)
+        self.__wait(INTERVAL_SHORT)
         for card in cards:
             if 1 <= card <= 5:
                 x, y, w, h = self.__button('card')
