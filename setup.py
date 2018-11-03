@@ -5,8 +5,9 @@ with open('README.md', 'r') as f:
 
 setup(
     name='fgo-bot',
-    version='0.1',
+    version='0.2',
     packages=find_packages(),
+    include_package_data=True,
 
     author='willC',
     author_email='will7101c@gmail.com',
