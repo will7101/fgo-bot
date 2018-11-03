@@ -255,7 +255,7 @@ class BattleBot:
 
             rounds += 1
             logger.info('At stage {}/{}, round {}, calling handler function...'
-                        .format(stage, rounds, self.stage_count))
+                        .format(stage, self.stage_count, rounds))
             self.stage_handlers[stage]()
 
             while True:
