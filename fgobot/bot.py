@@ -260,7 +260,7 @@ class BattleBot:
 
             while True:
                 self.__wait(INTERVAL_MID)
-                if self.__exists('bond'):
+                if self.__exists('bond') or self.__exists('bond_up'):
                     logger.info("'与从者的羁绊' detected. Leaving battle...")
                     return rounds
                 elif self.__exists('attack'):
@@ -268,12 +268,16 @@ class BattleBot:
                     break
 
     def __end_battle(self):
-        self.__find_and_tap('bond')
-        self.__wait(INTERVAL_SHORT)
-        self.__wait_until('gain_exp')
-        self.__find_and_tap('gain_exp')
-        self.__wait(INTERVAL_SHORT)
-        self.__wait_until('next_step')
+        # self.__find_and_tap('bond')
+        # self.__wait(INTERVAL_SHORT)
+        # self.__wait_until('gain_exp')
+        # self.__find_and_tap('gain_exp')
+        # self.__wait(INTERVAL_SHORT)
+        self.__wait(INTERVAL_MID)
+        while not self.__exists('next_step'):
+            self.device.tap_rand(640, 360, 50, 50)
+            self.__wait(INTERVAL_MID)
+
         self.__find_and_tap('next_step')
         self.__wait(INTERVAL_MID)
 
@@ -326,8 +330,8 @@ class BattleBot:
                 x += self.buttons['choose_object_distance'] * (obj - 1)
                 self.device.tap_rand(x, y, w, h)
                 logger.debug('Chose skill object {}.'.format(obj))
-                self.__wait(INTERVAL_SHORT)
-                self.__wait(INTERVAL_SHORT)
+
+        self.__wait(INTERVAL_SHORT * 2)
 
     def use_master_skill(self, skill: int, obj=None, obj2=None):
         """
@@ -379,6 +383,8 @@ class BattleBot:
             else:
                 logger.error('Invalid master skill object.')
 
+        self.__wait(INTERVAL_SHORT)
+
     def attack(self, cards: list):
         """
         Tap attack __button and choose three cards.
@@ -393,8 +399,7 @@ class BattleBot:
         self.__wait_until('attack')
 
         self.__find_and_tap('attack')
-        self.__wait(INTERVAL_SHORT)
-        self.__wait(INTERVAL_SHORT)
+        self.__wait(INTERVAL_SHORT * 2)
         for card in cards:
             if 1 <= card <= 5:
                 x, y, w, h = self.__button('card')
