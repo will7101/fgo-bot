@@ -28,6 +28,7 @@ class BattleBot:
     def __init__(self,
                  quest: str = 'quest.png',
                  friend: Union[str, List[str]] = 'friend.png',
+                 stage_count = 3,
                  ap: List[str] = None,
                  quest_threshold: float = 0.97,
                  friend_threshold: float = 0.97
@@ -36,6 +37,7 @@ class BattleBot:
 
         :param quest: path to image of the quest to play
         :param friend: path to image(s) of the preferred friend servant
+        :param stage_count: the number of states in a battle
         :param ap: the preferred AP regeneration item.
                    Options are 'silver_apple', 'gold_apple', 'quartz'.
                    i.e. ['silver_apple', 'gold_apple'] means: to use silver apple first
@@ -52,7 +54,7 @@ class BattleBot:
         # A dict of configurations.
         self.config = {}
 
-        self.stage_count = 3
+        self.stage_count = stage_count
         logger.info('Stage count set to {}.'.format(self.stage_count))
 
         # Device

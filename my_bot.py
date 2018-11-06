@@ -23,6 +23,9 @@ bot = BattleBot(
     # 如果不指定ap参数，则当体力耗尽时停止运行
     ap=['silver_apple', 'gold_apple'],
 
+    # 要打的关卡有3面
+    stage_count=3,
+
     # 关卡图像识别的阈值为0.97
     # 如果设的过低会导致进错本，太高会导致无法进本，请根据实际情况调整
     quest_threshold=0.97,
