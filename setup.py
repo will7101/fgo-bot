@@ -11,6 +11,7 @@ setup(
     install_requires=[
         'opencv-python',
         'numpy',
+        'matplotlib'
     ],
 
     author='willC',
