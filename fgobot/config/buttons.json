@@ -39,28 +39,36 @@
     "h": 50
   },
   "choose_object_distance": 318,
-  "card":{
+  "card": {
     "x": 77,
     "y": 433,
     "w": 100,
     "h": 100
   },
-  "noble_card":{
+  "noble_card": {
     "x": 363,
     "y": 142,
     "w": 100,
     "h": 100
   },
   "card_distance": 256,
-  "change":{
-    "x":87,
-    "y":300,
-    "w":100,
-    "h":100
+  "change": {
+    "x": 87,
+    "y": 300,
+    "w": 100,
+    "h": 100
   },
   "change_distance": 200,
-  "swipe": {
-    "friend": [600, 602, 600, 400],
-    "quest": [960, 588, 960, 400]
+  "swipe_friend": {
+    "x1": 600,
+    "y1": 602,
+    "x2": 600,
+    "y2": 400
+  },
+  "swipe_quest": {
+    "x1": 960,
+    "y1": 588,
+    "x2": 960,
+    "y2": 400
   }
 }
