@@ -203,7 +203,7 @@ class BattleBot:
 
     def __find_friend(self) -> str:
         self.__wait_until('refresh_friends')
-        for _ in range(7):
+        for _ in range(9):
             for fid in range(self.friend_count):
                 im = 'f_{}'.format(fid)
                 if self.__exists(im, threshold=self.friend_threshold):
@@ -304,17 +304,20 @@ class BattleBot:
         self.__find_and_tap('next_step')
         self.__wait(INTERVAL_MID)
 
-        # quest first-complete reward
-        if self.__exists('please_tap'):
-            self.__find_and_tap('please_tap')
+        while not self.__exists('menu'):
+            # not send friend application
+            if self.__exists('not_apply'):
+                self.__find_and_tap('not_apply')
+                self.__wait(INTERVAL_SHORT)
+
+            # quest first-complete reward
+            if self.__exists('please_tap'):
+                self.__find_and_tap('please_tap')
+                self.__wait(INTERVAL_SHORT)
+
             self.__wait(INTERVAL_SHORT)
 
-        # not send friend application
-        if self.__exists('not_apply'):
-            self.__find_and_tap('not_apply')
-            self.__wait(INTERVAL_SHORT)
-
-        self.__wait_until('menu')
+        # self.__wait_until('menu')
 
     def at_stage(self, stage: int):
         """
