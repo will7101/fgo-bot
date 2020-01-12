@@ -42,3 +42,6 @@ m4/lt~obsolete.m4
 autom4te.cache
 
 /.idea
+xp_bot_ac.py
+qp_bot.py
+fgobot/device-wg.py

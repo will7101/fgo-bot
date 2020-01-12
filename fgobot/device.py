@@ -16,7 +16,7 @@ class Device:
     A class of the android device controller that provides interface such as screenshots and clicking.
     """
 
-    def __init__(self, timeout: int = 15, adb_path: str = 'adb'):
+    def __init__(self, timeout: int = 30, adb_path: str = 'adb'):
         """
 
         :param timeout: the timeout of executing commands.
@@ -100,7 +100,8 @@ class Device:
         for line in output:
             if line.startswith('Physical size'):
                 self.size = tuple(map(int, re.findall(r'\d+', line)))
-                self.logger.info('Got screen size {:d} x {:d}'.format(self.size[0], self.size[1]))
+                self.logger.info('Got screen size {:d} x {:d}'.format(
+                    self.size[0], self.size[1]))
                 return True
         self.logger.error('Failed to get screen size')
         self.logger.error('Error message: {}'.format('\n'.join(output)))
@@ -119,7 +120,8 @@ class Device:
         for line in output:
             if line.startswith('error'):
                 self.logger.error('Failed to tap at {}'.format(coords))
-                self.logger.error('Error message: {}'.format('\n'.join(output)))
+                self.logger.error(
+                    'Error message: {}'.format('\n'.join(output)))
                 return False
         self.logger.debug('Tapped at {}'.format(coords))
         return True
@@ -137,7 +139,7 @@ class Device:
         y = randint(y, y + h - 1)
         return self.tap(x, y)
 
-    def swipe(self, pos0: Tuple[int, int], pos1: Tuple[int, int], duration: int = 500) -> bool:
+    def swipe_rand(self, x1: int, y1: int, x2: int, y2: int, duration: int = 500) -> bool:
         """
         Input a swipe event from `pos0` to `pos1`, taking `duration` milliseconds.
 
@@ -146,15 +148,20 @@ class Device:
         :param duration: the time (in milliseconds) the swipe will take.
         :return: whether the event is successful.
         """
-        coords0 = '{:d} {:d}'.format(pos0[0], pos0[1])
-        coords1 = '{:d} {:d}'.format(pos1[0], pos1[1])
-        output = self.__run_cmd(['shell', 'input swipe {} {} {:d}'.format(coords0, coords1, duration)])
+        x1, y1, x2, y2 = map(lambda x: x + randint(-5, 5), (x1, y1, x2, y2))
+        coords0 = '{:d} {:d}'.format(x1, y1)
+        coords1 = '{:d} {:d}'.format(x2, y2)
+        output = self.__run_cmd(
+            ['shell', 'input swipe {} {} {:d}'.format(coords0, coords1, duration)])
         for line in output:
             if line.startswith('error'):
-                self.logger.error('Failed to swipe from {} to {} taking {:d}ms'.format(coords0, coords1, duration))
-                self.logger.error('Error message: {}'.format('\n'.join(output)))
+                self.logger.error('Failed to swipe from {} to {} taking {:d}ms'.format(
+                    coords0, coords1, duration))
+                self.logger.error(
+                    'Error message: {}'.format('\n'.join(output)))
                 return False
-        self.logger.debug('Swiped from {} to {} taking {:d}ms'.format(coords0, coords1, duration))
+        self.logger.debug('Swiped from {} to {} taking {:d}ms'.format(
+            coords0, coords1, duration))
         return True
 
     # methods of capturing the screen.
@@ -173,7 +180,8 @@ class Device:
         pos1 = s.find(b'\x1a')
         pos2 = s.find(b'\n', pos1)
         pattern = s[pos1 + 1:pos2 + 1]
-        logging.getLogger('device').debug("Pattern detected: '{}'".format(pattern))
+        logging.getLogger('device').debug(
+            "Pattern detected: '{}'".format(pattern))
         return re.sub(pattern, b'\n', s)
 
     def capture(self, method=FROM_SHELL) -> Union[np.ndarray, None]:

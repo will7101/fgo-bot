@@ -16,7 +16,7 @@ TM_METHOD = cv.TM_CCOEFF_NORMED
 
 
 class TM:
-    def __init__(self, feed: Callable, threshold: float = 0.85):
+    def __init__(self, feed: Callable, threshold: float = 0.85, zoom_ratio: float = 1.0):
         """
 
         :param feed: the screencap feed function
@@ -26,6 +26,7 @@ class TM:
         self.feed = feed
 
         self.threshold = threshold
+        self.zoom_ratio = zoom_ratio
 
         # template image set
         self.images = {}
@@ -54,7 +55,8 @@ class TM:
         """
         Load template images from directory.
         """
-        im_dir = Path(__file__).absolute().parent / 'images'
+        im_dir = Path(__file__).absolute().parent / \
+            'images' / str("%dp" % int(self.zoom_ratio*720))
         for im in im_dir.glob('*.png'):
             self.load_image(im)
 
