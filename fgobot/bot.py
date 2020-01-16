@@ -86,7 +86,7 @@ class BattleBot:
         self.friend_threshold = friend_threshold
 
         # Load button coords from config
-        btn_path = Path(__file__).absolute().parent / 'config' / 'buttons.json'
+        btn_path = 'fgobot/config/buttons.json'
         with open(btn_path) as f:
             self.buttons = json.load(f)
 
@@ -260,6 +260,10 @@ class BattleBot:
                         .format(stage, self.stage_count, rounds))
             self.stage_handlers[stage]()
 
+            flag = False
+            if stage == 3:
+                flag = True 
+
             while True:
                 self.__wait(INTERVAL_MID)
                 if self.__exists('bond') or self.__exists('bond_up'):
@@ -267,7 +271,13 @@ class BattleBot:
                     return rounds
                 elif self.__exists('attack'):
                     logger.info("'Attack' detected. Continuing loop...")
-                    break
+                    if flag:
+                        self.attack([1, 2, 3])
+                        self.__wait(INTERVAL_MID)
+                    else: 
+                        break
+        # while True:
+            
 
     def __end_battle(self):
         # self.__find_and_tap('bond')

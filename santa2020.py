@@ -7,13 +7,13 @@ from fgobot import BattleBot
 import logging
 
 # 指定日志的输出等级（DEBUG / INFO / WARNING / ERROR）
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.DEBUG)
 
 # 实例化一个bot
 bot = BattleBot(
 
     # 要打的关卡截图为'qp.png'，放在这个文件的同一级目录下
-    quest='arena.png',
+    quest='final.png',
 
     # 需要的助战截图为'friend_qp.png'，放在这个文件的同一级目录下
     # 如果可以接受的助战有多个，可以传入一个list，例如：friend=['friend1.png', 'friend2.png]
@@ -64,7 +64,6 @@ def stage_1():
 # 第二面的打法
 @bot.at_stage(2)
 def stage_2():
-    s(1, 2)  # 斯卡哈减防
     s(1, 3, obj=2)  # 斯卡哈充能
     a([7, 1, 2])  # 女武神宝具卡
 
@@ -72,6 +71,7 @@ def stage_2():
 # 第三面的打法
 @bot.at_stage(3)
 def stage_3():
+    s(1, 2)  # 斯卡哈减防
     s(3, 2)  # 斯卡哈减防
     s(3, 3, obj=2)  # 斯卡哈充能
     a([7, 1, 2])  # 女武神宝具卡
@@ -86,4 +86,4 @@ if __name__ == '__main__':
         bot.device.connect('127.0.0.1:62001')
 
     # 启动bot，最多打5次
-    bot.run(max_loops=5)
+    bot.run(max_loops=5000)
