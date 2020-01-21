@@ -12,12 +12,14 @@ from pathlib import Path
 from time import sleep
 from typing import Tuple, List, Union
 from random import randint
+import cv2
+import time
 
 logger = logging.getLogger('bot')
 
-INTERVAL_SHORT = 1
-INTERVAL_MID = 2
-INTERVAL_LONG = 10
+INTERVAL_SHORT = 0.5
+INTERVAL_MID = 1
+INTERVAL_LONG = 5
 
 
 class BattleBot:
@@ -276,8 +278,6 @@ class BattleBot:
                         self.__wait(INTERVAL_MID)
                     else: 
                         break
-        # while True:
-            
 
     def __end_battle(self):
         # self.__find_and_tap('bond')
@@ -291,6 +291,7 @@ class BattleBot:
             self.__wait(INTERVAL_MID)
 
         self.__find_and_tap('next_step')
+        cv2.imwrite('screenshots/{}.jpg'.format(time.time()), self.tm.screen)
         self.__wait(INTERVAL_MID)
 
         # quest first-complete reward

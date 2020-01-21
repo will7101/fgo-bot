@@ -7,17 +7,17 @@ from fgobot import BattleBot
 import logging
 
 # 指定日志的输出等级（DEBUG / INFO / WARNING / ERROR）
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.DEBUG)
 
 # 实例化一个bot
 bot = BattleBot(
 
     # 要打的关卡截图为'qp.png'，放在这个文件的同一级目录下
-    quest='final.png',
+    quest='free.png',
 
     # 需要的助战截图为'friend_qp.png'，放在这个文件的同一级目录下
     # 如果可以接受的助战有多个，可以传入一个list，例如：friend=['friend1.png', 'friend2.png]
-    friend='friend_sikaha.png',
+    friend='friend_sikaha2.png',
 
     # AP策略为：当体力耗尽时，优先吃银苹果，再吃金苹果
     # 如果不指定ap参数，则当体力耗尽时停止运行
@@ -86,4 +86,4 @@ if __name__ == '__main__':
         bot.device.connect('127.0.0.1:62001')
 
     # 启动bot，最多打5次
-    bot.run(max_loops=5000)
+    bot.run(max_loops=350)
