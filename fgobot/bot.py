@@ -244,6 +244,68 @@ class BattleBot:
         self.__wait_until('attack')
         return True
 
+    def __continue_battle(self) -> bool:
+        """
+        continue the same battle.
+
+        :return: whether successful.
+        """
+        self.__wait(INTERVAL_MID)
+        while not self.__exists('next_step'):
+            self.device.tap_rand(640, 360, 50, 50)
+            self.__wait(INTERVAL_MID)
+
+        self.__find_and_tap('next_step')
+        cv2.imwrite('screenshots/{}.jpg'.format(time.time()), self.tm.screen)
+        self.__wait(INTERVAL_MID)
+
+        # quest first-complete reward
+        if self.__exists('please_tap'):
+            self.__find_and_tap('please_tap')
+            self.__wait(INTERVAL_SHORT)
+
+        # not send friend application
+        if self.__exists('not_apply'):
+            self.__find_and_tap('not_apply')
+
+        self.__wait_until('continue_battle')
+        self.__find_and_tap('continue_battle')
+        # self.device.tap_rand(750, 580, 180, 40)
+
+        self.__wait(INTERVAL_MID)
+
+        # no enough AP
+        if self.__exists('ap_regen'):
+            if not self.ap:
+                return False
+            else:
+                ok = False
+                for ap_item in self.ap:
+                    if self.__find_and_tap(ap_item):
+                        self.__wait(1)
+                        if self.__find_and_tap('decide'):
+                            self.__wait_until('refresh_friends')
+                            ok = True
+                            break
+                if not ok:
+                    return False
+
+        # look for friend servant
+        friend = self.__find_friend()
+        while not friend:
+            self.__find_and_tap('refresh_friends')
+            self.__wait(INTERVAL_SHORT)
+            self.__find_and_tap('yes')
+            self.__wait(INTERVAL_LONG)
+            friend = self.__find_friend()
+        self.__find_and_tap(friend)
+        self.__wait(INTERVAL_SHORT)
+        # self.__wait_until('start_quest')
+        # self.__find_and_tap('start_quest')
+        self.__wait(INTERVAL_SHORT)
+        self.__wait_until('attack')
+        return True
+
     def __play_battle(self) -> int:
         """
         Play the battle.
@@ -432,13 +494,17 @@ class BattleBot:
         :param max_loops: the max number of loops.
         """
         count = 0
-        for n_loop in range(max_loops):
+        self.__enter_battle()
+        self.__play_battle()
+        # self.__continue_battle()
+        for n_loop in range(1, max_loops):
             logger.info('Entering battle...')
-            if not self.__enter_battle():
+            if not self.__continue_battle():
                 logger.info('AP runs out. Quiting...')
                 break
             rounds = self.__play_battle()
-            self.__end_battle()
+            # self.__continue_battle()
+            # self.__end_battle()
             count += 1
             logger.info('{}-th Battle complete. {} rounds played.'.format(count, rounds))
 

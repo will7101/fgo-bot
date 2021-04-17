@@ -21,7 +21,7 @@ bot = BattleBot(
 
     # AP策略为：当体力耗尽时，优先吃银苹果，再吃金苹果
     # 如果不指定ap参数，则当体力耗尽时停止运行
-    ap=['gold_apple'],
+    ap=['silver_apple'],
 
     # 要打的关卡有3面
     stage_count=3,
@@ -83,7 +83,7 @@ if __name__ == '__main__':
     # 检查设备是否连接
     if not bot.device.connected():
         # 如果没有连接，则尝试通过本地端口62001连接（具体参数请参考自己的设备/模拟器）
-        bot.device.connect('127.0.0.1:62001')
+        bot.device.connect('127.0.0.1:59865')
 
     # 启动bot，最多打5次
-    bot.run(max_loops=350)
+    bot.run(max_loops=100)
