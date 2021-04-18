@@ -7,7 +7,7 @@ from fgobot import BattleBot
 import logging
 
 # 指定日志的输出等级（DEBUG / INFO / WARNING / ERROR）
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.INFO)
 
 # 实例化一个bot
 bot = BattleBot(
@@ -21,7 +21,7 @@ bot = BattleBot(
 
     # AP策略为：当体力耗尽时，优先吃银苹果，再吃金苹果
     # 如果不指定ap参数，则当体力耗尽时停止运行
-    ap=['silver_apple'],
+    ap=['bronze_apple'],
 
     # 要打的关卡有3面
     stage_count=3,
@@ -86,4 +86,4 @@ if __name__ == '__main__':
         bot.device.connect('127.0.0.1:59865')
 
     # 启动bot，最多打5次
-    bot.run(max_loops=100)
+    bot.run(max_loops=500)

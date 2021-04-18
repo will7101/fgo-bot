@@ -218,6 +218,10 @@ class BattleBot:
                 return False
             else:
                 ok = False
+                # self.__find_and_tap('scoll_bar')
+                # self.__wait(1)
+                self.__swipe('ap')
+                self.__wait(INTERVAL_SHORT)
                 for ap_item in self.ap:
                     if self.__find_and_tap(ap_item):
                         self.__wait(1)
@@ -280,7 +284,12 @@ class BattleBot:
                 return False
             else:
                 ok = False
+                # self.__find_and_tap('scoll_bar')
+                # self.__wait(1)
+                self.__swipe('ap')
+                self.__wait(INTERVAL_SHORT)
                 for ap_item in self.ap:
+                    print(ap_item)
                     if self.__find_and_tap(ap_item):
                         self.__wait(1)
                         if self.__find_and_tap('decide'):
@@ -506,6 +515,8 @@ class BattleBot:
             # self.__continue_battle()
             # self.__end_battle()
             count += 1
-            logger.info('{}-th Battle complete. {} rounds played.'.format(count, rounds))
-
-        logger.info('{} Battles played in total. Good bye!'.format(count))
+            if count == max_loops - 1:
+                logger.info('{} Battles played in total. Good bye!'.format(count + 1))
+                break
+            else:
+                logger.info('{}-th Battle complete. {} rounds played.'.format(count + 1, rounds))
