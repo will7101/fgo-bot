@@ -1,5 +1,6 @@
 import logging
 import datetime 
+import argparse 
 
 from fgobot import BattleBot
 
@@ -15,7 +16,7 @@ bot = BattleBot(
 
     # 需要的助战截图为'friend_qp.png'，放在这个文件的同一级目录下
     # 如果可以接受的助战有多个，可以传入一个list，例如：friend=['friend1.png', 'friend2.png]
-    friend='friend_merlin.png',
+    friend=['friend_merlin.png', 'friend_merlin1.png'], 
 
     # AP策略为：当体力耗尽时，优先吃银苹果，再吃金苹果
     # 如果不指定ap参数，则当体力耗尽时停止运行
@@ -30,7 +31,7 @@ bot = BattleBot(
 
     # 助战图像识别的阈值为0.95
     # 如果设的过低会导致选择错误的助战，太高会导致选不到助战，请根据实际情况调整
-    friend_threshold=0.95
+    friend_threshold=0.92
 )
 
 # 为了方便，使用了简写
@@ -67,10 +68,16 @@ def stage_3():
 # 程序的入口点（不加这行也可以）
 # 使用时，可以直接在命令行运行'python my_bot.py'
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-p', dest='port', default=62001, help='adb device port')
+    parser.add_argument('-n', dest='number_loops', default=3, help='number of loops to be ran')
+    parser.add_argument('-v', dest='verbosity', action='store_true', help='debug or not')
+    args = parser.parse_args()
+
     # 检查设备是否连接
     if not bot.device.connected():
         # 如果没有连接，则尝试通过本地端口62001连接（具体参数请参考自己的设备/模拟器）
-        bot.device.connect('127.0.0.1:59865')
+        bot.device.connect(f'127.0.0.1:{args.port}')
 
     # 启动bot，最多打5次
-    bot.run(max_loops=2)
+    bot.run(max_loops=int(args.number_loops))
