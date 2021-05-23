@@ -168,7 +168,7 @@ class BattleBot:
         while not self.__exists(im):
             self.__wait(INTERVAL_MID)
 
-    def __get_current_stage(self) -> int:
+    def get_current_stage(self) -> int:
         """
         Get the current stage in battle.
 
@@ -323,7 +323,7 @@ class BattleBot:
         """
         rounds = 0
         while True:
-            stage = self.__get_current_stage()
+            stage = self.get_current_stage()
             if stage == -1:
                 logger.error("Failed to get current stage. Leaving battle...")
                 return rounds
