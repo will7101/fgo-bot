@@ -45,10 +45,24 @@ a = bot.attack
 def stage_1():
     # s(1, 1)表示使用1号从者的技能1
     s(2, 3)  # 大英雄充能
-    if datetime.datetime.now().weekday() in [3, 6]:
+    if datetime.datetime.now().weekday() in [0, 3, 6]:
         s(3, 3, obj=2)  # 周四枪本，梅林英雄塑造
-    # (a[6, 1, 2])表示出卡顺序为：6号卡（1号从者宝具卡），1号卡，2号卡
-    a([7, 1, 2])  # 大英雄宝具卡
+        # (a[6, 1, 2])表示出卡顺序为：6号卡（1号从者宝具卡），1号卡，2号卡
+        a([7, 1, 2])  # 大英雄宝具卡
+        import time 
+
+        time.sleep(4)
+        # 处理枪阶
+        while True:
+            stage = bot.get_current_stage() 
+            if stage == 1:
+                a(1, 2, 3)
+            elif stage == 2:
+                break
+            else: 
+                time.sleep(4) 
+    else:
+        a([7, 1, 2])  # 大英雄宝具卡
 
 
 # 第二面的打法
