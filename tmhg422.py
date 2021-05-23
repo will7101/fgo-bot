@@ -56,7 +56,7 @@ def stage_1():
         while True:
             stage = bot.get_current_stage() 
             if stage == 1:
-                a(1, 2, 3)
+                a([1, 2, 3])
             elif stage == 2:
                 break
             else: 
