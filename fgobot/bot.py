@@ -343,7 +343,7 @@ class BattleBot:
                     logger.info("'与从者的羁绊' detected. Leaving battle...")
                     return rounds
                 elif self.__exists('attack'):
-                    logger.info("'Attack' detected. Continuing loop...")
+                    logger.debug("'Attack' detected. Continuing to next stage...")
                     if flag:
                         self.attack([1, 2, 3])
                         self.__wait(INTERVAL_MID)
