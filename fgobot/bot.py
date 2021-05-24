@@ -254,28 +254,7 @@ class BattleBot:
 
         :return: whether successful.
         """
-        self.__wait(INTERVAL_MID)
-        while not self.__exists('next_step'):
-            self.device.tap_rand(640, 360, 50, 50)
-            self.__wait(INTERVAL_MID)
-
-        self.__find_and_tap('next_step')
-        cv2.imwrite('screenshots/{}.jpg'.format(time.time()), self.tm.screen)
-        self.__wait(INTERVAL_MID)
-
-        # quest first-complete reward
-        if self.__exists('please_tap'):
-            self.__find_and_tap('please_tap')
-            self.__wait(INTERVAL_SHORT)
-
-        # not send friend application
-        if self.__exists('not_apply'):
-            self.__find_and_tap('not_apply')
-
-        self.__wait_until('continue_battle')
-        self.__find_and_tap('continue_battle')
-        # self.device.tap_rand(750, 580, 180, 40)
-
+        self.__end_battle(continue_battle=True)
         self.__wait(INTERVAL_MID)
 
         # no enough AP
@@ -350,12 +329,14 @@ class BattleBot:
                     else: 
                         break
 
-    def __end_battle(self):
-        # self.__find_and_tap('bond')
-        # self.__wait(INTERVAL_SHORT)
-        # self.__wait_until('gain_exp')
-        # self.__find_and_tap('gain_exp')
-        # self.__wait(INTERVAL_SHORT)
+    def __end_battle(self, continue_battle=False):
+        """
+        End the battle, or continue to the next battle
+
+        :param continue_battle: 是否连续初级
+
+        :return: count of rounds.
+        """
         self.__wait(INTERVAL_MID)
         while not self.__exists('next_step'):
             self.device.tap_rand(640, 360, 50, 50)
@@ -375,9 +356,14 @@ class BattleBot:
             self.__find_and_tap('not_apply')
 
         self.__wait_until('continue_battle')
-        self.__find_and_tap('close')
 
-        self.__wait_until('menu')
+        if continue_battle:
+            # 连续战斗（点击连续出击，触发ap_regen或者从者的选择）
+            self.__find_and_tap('continue_battle')
+        else:
+            # 退出战斗（点击关闭，退出到菜单页面）
+            self.__find_and_tap('close')
+            self.__wait_until('menu')
 
     def at_stage(self, stage: int):
         """
@@ -508,15 +494,12 @@ class BattleBot:
         count = 0
         self.__enter_battle()
         self.__play_battle()
-        # self.__continue_battle()
         for n_loop in range(1, max_loops):
             logger.info('Entering battle...')
             if not self.__continue_battle():
                 logger.info('AP runs out. Quiting...')
                 break
             rounds = self.__play_battle()
-            # self.__continue_battle()
-            # self.__end_battle()
             count += 1
             if count == max_loops - 1:
                 logger.info('{} Battles played in total. Good bye!'.format(count + 1))
