@@ -374,6 +374,9 @@ class BattleBot:
         if self.__exists('not_apply'):
             self.__find_and_tap('not_apply')
 
+        self.__wait_until('continue_battle')
+        self.__find_and_tap('close')
+
         self.__wait_until('menu')
 
     def at_stage(self, stage: int):
@@ -520,3 +523,4 @@ class BattleBot:
                 break
             else:
                 logger.info('{}-th Battle complete. {} rounds played.'.format(count + 1, rounds))
+        self.__end_battle()
