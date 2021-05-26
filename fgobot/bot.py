@@ -200,16 +200,19 @@ class BattleBot:
             self.__wait(INTERVAL_SHORT)
         return ''
 
-    def __enter_battle(self) -> bool:
+    def __enter_battle(self, first: bool = None) -> bool:
         """
         Enter the battle.
 
         :return: whether successful.
         """
-        self.__wait_until('menu')
-        while not self.__find_and_tap('quest', threshold=self.quest_threshold):
-            self.__swipe('quest')
-            self.__wait(INTERVAL_SHORT)
+        if first:
+            self.__wait_until('menu')
+            while not self.__find_and_tap('quest', threshold=self.quest_threshold):
+                self.__swipe('quest')
+                self.__wait(INTERVAL_SHORT)
+        else:
+            self.__end_battle(continue_battle=True)
         self.__wait(INTERVAL_MID)
 
         # no enough AP
@@ -242,8 +245,9 @@ class BattleBot:
             friend = self.__find_friend()
         self.__find_and_tap(friend)
         self.__wait(INTERVAL_SHORT)
-        self.__wait_until('start_quest')
-        self.__find_and_tap('start_quest')
+        if first:
+            self.__wait_until('start_quest')
+            self.__find_and_tap('start_quest')
         self.__wait(INTERVAL_SHORT)
         self.__wait_until('attack')
         return True
@@ -329,7 +333,7 @@ class BattleBot:
                     else: 
                         break
 
-    def __end_battle(self, continue_battle=False):
+    def __end_battle(self, continue_battle: bool = None):
         """
         End the battle, or continue to the next battle
 
@@ -492,11 +496,11 @@ class BattleBot:
         :param max_loops: the max number of loops.
         """
         count = 0
-        self.__enter_battle()
+        self.__enter_battle(first=True)
         self.__play_battle()
         for n_loop in range(1, max_loops):
             logger.info('Entering battle...')
-            if not self.__continue_battle():
+            if not self.__enter_battle(first=False):
                 logger.info('AP runs out. Quiting...')
                 break
             rounds = self.__play_battle()
@@ -506,4 +510,4 @@ class BattleBot:
                 break
             else:
                 logger.info('{}-th Battle complete. {} rounds played.'.format(count + 1, rounds))
-        self.__end_battle()
+        self.__end_battle(continue_battle=False)
