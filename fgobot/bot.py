@@ -328,6 +328,7 @@ class BattleBot:
                 elif self.__exists('attack'):
                     logger.debug("'Attack' detected. Continuing to next stage...")
                     if flag:
+                        # TODO: brave card first
                         self.attack([1, 2, 3])
                         self.__wait(INTERVAL_MID)
                     else: 
@@ -365,6 +366,7 @@ class BattleBot:
             # 连续战斗（点击连续出击，触发ap_regen或者从者的选择）
             self.__find_and_tap('continue_battle')
         else:
+            # TODO: exit for 1st exp card quest everyday 
             # 退出战斗（点击关闭，退出到菜单页面）
             self.__find_and_tap('close')
             self.__wait_until('menu')
