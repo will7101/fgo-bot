@@ -252,52 +252,6 @@ class BattleBot:
         self.__wait_until('attack')
         return True
 
-    def __continue_battle(self) -> bool:
-        """
-        continue the same battle.
-
-        :return: whether successful.
-        """
-        self.__end_battle(continue_battle=True)
-        self.__wait(INTERVAL_MID)
-
-        # no enough AP
-        if self.__exists('ap_regen'):
-            if not self.ap:
-                return False
-            else:
-                ok = False
-                # self.__find_and_tap('scoll_bar')
-                # self.__wait(1)
-                self.__swipe('ap')
-                self.__wait(INTERVAL_SHORT)
-                for ap_item in self.ap:
-                    print(ap_item)
-                    if self.__find_and_tap(ap_item):
-                        self.__wait(1)
-                        if self.__find_and_tap('decide'):
-                            self.__wait_until('refresh_friends')
-                            ok = True
-                            break
-                if not ok:
-                    return False
-
-        # look for friend servant
-        friend = self.__find_friend()
-        while not friend:
-            self.__find_and_tap('refresh_friends')
-            self.__wait(INTERVAL_SHORT)
-            self.__find_and_tap('yes')
-            self.__wait(INTERVAL_LONG)
-            friend = self.__find_friend()
-        self.__find_and_tap(friend)
-        self.__wait(INTERVAL_SHORT)
-        # self.__wait_until('start_quest')
-        # self.__find_and_tap('start_quest')
-        self.__wait(INTERVAL_SHORT)
-        self.__wait_until('attack')
-        return True
-
     def __play_battle(self) -> int:
         """
         Play the battle.
