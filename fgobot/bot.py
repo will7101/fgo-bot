@@ -191,6 +191,7 @@ class BattleBot:
 
     def __find_friend(self) -> str:
         self.__wait_until('refresh_friends')
+        self.__wait(INTERVAL_SHORT)
         for _ in range(6):
             for fid in range(self.friend_count):
                 im = 'f_{}'.format(fid)
@@ -241,8 +242,9 @@ class BattleBot:
             self.__find_and_tap('refresh_friends')
             self.__wait(INTERVAL_SHORT)
             self.__find_and_tap('yes')
-            self.__wait(INTERVAL_LONG)
             friend = self.__find_friend()
+            # TODO: reduce wait time to 2.0(4xINTERVAL_SHORT)
+            self.__wait(INTERVAL_LONG)
         self.__find_and_tap(friend)
         self.__wait(INTERVAL_SHORT)
         if first:
