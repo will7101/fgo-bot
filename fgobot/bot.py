@@ -304,7 +304,7 @@ class BattleBot:
             self.__wait(INTERVAL_MID)
 
         self.__find_and_tap('next_step')
-        cv2.imwrite('screenshots/{}.jpg'.format(time.time()), self.tm.screen)
+        cv2.imwrite('screenshots/{}.jpg'.format(time.strftime("%Y%m%d-%H%M%S")), self.tm.screen)
         self.__wait(INTERVAL_MID)
 
         # quest first-complete reward
@@ -443,6 +443,7 @@ class BattleBot:
             elif 6 <= card <= 8:
                 x, y, w, h = self.__button('noble_card')
                 x += self.buttons['card_distance'] * (card - 6)
+                sleep(INTERVAL_SHORT)
                 self.device.tap_rand(x, y, w, h)
             else:
                 logger.error('Card number must be in range [1, 8]')
