@@ -364,9 +364,14 @@ class BattleBot:
                 x, y, w, h = self.__button('choose_object')
                 x += self.buttons['choose_object_distance'] * (obj - 1)
                 self.device.tap_rand(x, y, w, h)
+                time.sleep(0.01)
+                self.device.tap_rand(x, y, w, h)
                 logger.debug('Chose skill object {}.'.format(obj))
+        else:
+            time.sleep(0.01)
+            self.device.tap_rand(x, y, w, h)
 
-        self.__wait(INTERVAL_SHORT * 2)
+        self.__wait(INTERVAL_SHORT)
 
     def use_master_skill(self, skill: int, obj=None, obj2=None):
         """
@@ -441,9 +446,10 @@ class BattleBot:
                 x += self.buttons['card_distance'] * (card - 1)
                 self.device.tap_rand(x, y, w, h)
             elif 6 <= card <= 8:
+                # self.__wait(INTERVAL_SHORT * 2)
                 x, y, w, h = self.__button('noble_card')
                 x += self.buttons['card_distance'] * (card - 6)
-                sleep(INTERVAL_SHORT)
+                sleep(INTERVAL_MID * 2)
                 self.device.tap_rand(x, y, w, h)
             else:
                 logger.error('Card number must be in range [1, 8]')
