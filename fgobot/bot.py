@@ -12,12 +12,14 @@ from pathlib import Path
 from time import sleep
 from typing import Tuple, List, Union
 from random import randint
+import cv2
+import time
 
 logger = logging.getLogger('bot')
 
-INTERVAL_SHORT = 1
-INTERVAL_MID = 2
-INTERVAL_LONG = 10
+INTERVAL_SHORT = 0.5
+INTERVAL_MID = 1
+INTERVAL_LONG = 5
 
 
 class BattleBot:
@@ -86,7 +88,7 @@ class BattleBot:
         self.friend_threshold = friend_threshold
 
         # Load button coords from config
-        btn_path = Path(__file__).absolute().parent / 'config' / 'buttons.json'
+        btn_path = 'fgobot/config/buttons.json'
         with open(btn_path) as f:
             self.buttons = json.load(f)
 
@@ -166,7 +168,7 @@ class BattleBot:
         while not self.__exists(im):
             self.__wait(INTERVAL_MID)
 
-    def __get_current_stage(self) -> int:
+    def get_current_stage(self) -> int:
         """
         Get the current stage in battle.
 
@@ -189,6 +191,7 @@ class BattleBot:
 
     def __find_friend(self) -> str:
         self.__wait_until('refresh_friends')
+        self.__wait(INTERVAL_SHORT)
         for _ in range(6):
             for fid in range(self.friend_count):
                 im = 'f_{}'.format(fid)
@@ -198,16 +201,19 @@ class BattleBot:
             self.__wait(INTERVAL_SHORT)
         return ''
 
-    def __enter_battle(self) -> bool:
+    def __enter_battle(self, first: bool = None) -> bool:
         """
         Enter the battle.
 
         :return: whether successful.
         """
-        self.__wait_until('menu')
-        while not self.__find_and_tap('quest', threshold=self.quest_threshold):
-            self.__swipe('quest')
-            self.__wait(INTERVAL_SHORT)
+        if first:
+            self.__wait_until('menu')
+            while not self.__find_and_tap('quest', threshold=self.quest_threshold):
+                self.__swipe('quest')
+                self.__wait(INTERVAL_SHORT)
+        else:
+            self.__end_battle(continue_battle=True)
         self.__wait(INTERVAL_MID)
 
         # no enough AP
@@ -216,6 +222,10 @@ class BattleBot:
                 return False
             else:
                 ok = False
+                # self.__find_and_tap('scoll_bar')
+                # self.__wait(1)
+                self.__swipe('ap')
+                self.__wait(INTERVAL_SHORT)
                 for ap_item in self.ap:
                     if self.__find_and_tap(ap_item):
                         self.__wait(1)
@@ -232,12 +242,14 @@ class BattleBot:
             self.__find_and_tap('refresh_friends')
             self.__wait(INTERVAL_SHORT)
             self.__find_and_tap('yes')
-            self.__wait(INTERVAL_LONG)
             friend = self.__find_friend()
+            # TODO: reduce wait time to 2.0(4xINTERVAL_SHORT)
+            self.__wait(INTERVAL_LONG)
         self.__find_and_tap(friend)
         self.__wait(INTERVAL_SHORT)
-        self.__wait_until('start_quest')
-        self.__find_and_tap('start_quest')
+        if first:
+            self.__wait_until('start_quest')
+            self.__find_and_tap('start_quest')
         self.__wait(INTERVAL_SHORT)
         self.__wait_until('attack')
         return True
@@ -250,7 +262,7 @@ class BattleBot:
         """
         rounds = 0
         while True:
-            stage = self.__get_current_stage()
+            stage = self.get_current_stage()
             if stage == -1:
                 logger.error("Failed to get current stage. Leaving battle...")
                 return rounds
@@ -260,27 +272,39 @@ class BattleBot:
                         .format(stage, self.stage_count, rounds))
             self.stage_handlers[stage]()
 
+            flag = False
+            if stage == 3:
+                flag = True 
+
             while True:
                 self.__wait(INTERVAL_MID)
                 if self.__exists('bond') or self.__exists('bond_up'):
                     logger.info("'与从者的羁绊' detected. Leaving battle...")
                     return rounds
                 elif self.__exists('attack'):
-                    logger.info("'Attack' detected. Continuing loop...")
-                    break
+                    logger.debug("'Attack' detected. Continuing to next stage...")
+                    if flag:
+                        # TODO: brave card first
+                        self.attack([1, 2, 3])
+                        self.__wait(INTERVAL_MID)
+                    else: 
+                        break
 
-    def __end_battle(self):
-        # self.__find_and_tap('bond')
-        # self.__wait(INTERVAL_SHORT)
-        # self.__wait_until('gain_exp')
-        # self.__find_and_tap('gain_exp')
-        # self.__wait(INTERVAL_SHORT)
+    def __end_battle(self, continue_battle: bool = None):
+        """
+        End the battle, or continue to the next battle
+
+        :param continue_battle: 是否连续初级
+
+        :return: count of rounds.
+        """
         self.__wait(INTERVAL_MID)
         while not self.__exists('next_step'):
             self.device.tap_rand(640, 360, 50, 50)
             self.__wait(INTERVAL_MID)
 
         self.__find_and_tap('next_step')
+        cv2.imwrite('screenshots/{}.jpg'.format(time.strftime("%Y%m%d-%H%M%S")), self.tm.screen)
         self.__wait(INTERVAL_MID)
 
         # quest first-complete reward
@@ -292,7 +316,16 @@ class BattleBot:
         if self.__exists('not_apply'):
             self.__find_and_tap('not_apply')
 
-        self.__wait_until('menu')
+        self.__wait_until('continue_battle')
+
+        if continue_battle:
+            # 连续战斗（点击连续出击，触发ap_regen或者从者的选择）
+            self.__find_and_tap('continue_battle')
+        else:
+            # TODO: exit for 1st exp card quest everyday 
+            # 退出战斗（点击关闭，退出到菜单页面）
+            self.__find_and_tap('close')
+            self.__wait_until('menu')
 
     def at_stage(self, stage: int):
         """
@@ -331,9 +364,14 @@ class BattleBot:
                 x, y, w, h = self.__button('choose_object')
                 x += self.buttons['choose_object_distance'] * (obj - 1)
                 self.device.tap_rand(x, y, w, h)
+                time.sleep(0.01)
+                self.device.tap_rand(x, y, w, h)
                 logger.debug('Chose skill object {}.'.format(obj))
+        else:
+            time.sleep(0.01)
+            self.device.tap_rand(x, y, w, h)
 
-        self.__wait(INTERVAL_SHORT * 2)
+        self.__wait(INTERVAL_SHORT)
 
     def use_master_skill(self, skill: int, obj=None, obj2=None):
         """
@@ -408,8 +446,10 @@ class BattleBot:
                 x += self.buttons['card_distance'] * (card - 1)
                 self.device.tap_rand(x, y, w, h)
             elif 6 <= card <= 8:
+                # self.__wait(INTERVAL_SHORT * 2)
                 x, y, w, h = self.__button('noble_card')
                 x += self.buttons['card_distance'] * (card - 6)
+                sleep(INTERVAL_MID * 2)
                 self.device.tap_rand(x, y, w, h)
             else:
                 logger.error('Card number must be in range [1, 8]')
@@ -421,14 +461,18 @@ class BattleBot:
         :param max_loops: the max number of loops.
         """
         count = 0
-        for n_loop in range(max_loops):
+        self.__enter_battle(first=True)
+        self.__play_battle()
+        for n_loop in range(1, max_loops):
             logger.info('Entering battle...')
-            if not self.__enter_battle():
+            if not self.__enter_battle(first=False):
                 logger.info('AP runs out. Quiting...')
                 break
             rounds = self.__play_battle()
-            self.__end_battle()
             count += 1
-            logger.info('{}-th Battle complete. {} rounds played.'.format(count, rounds))
-
-        logger.info('{} Battles played in total. Good bye!'.format(count))
+            if count == max_loops - 1:
+                logger.info('{} Battles played in total. Good bye!'.format(count + 1))
+                break
+            else:
+                logger.info('{}-th Battle complete. {} rounds played.'.format(count + 1, rounds))
+        self.__end_battle(continue_battle=False)
